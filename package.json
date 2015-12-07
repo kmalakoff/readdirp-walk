@@ -1,0 +1,34 @@
+{
+  "name": "readdirp-walk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test-main": "(cd test && set -e; for t in ./*.js; do node $t; done)",
+    "test-0.8": "nave use 0.8 npm run test-main",
+    "test-0.10": "nave use 0.10 npm run test-main",
+    "test-0.12": "nave use 0.12 npm run test-main",
+    "test-2.4": "nave use 2.4 npm run test-main",
+    "test-all": "npm run test-main && npm run test-0.8 && npm run test-0.10 && npm run test-0.12 && npm run test-2.4",
+    "test": "if [ -e $TRAVIS ]; then npm run test-all; else npm run test-main; fi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmalakoff/readdirp-walk.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kmalakoff/readdirp-walk/issues"
+  },
+  "homepage": "https://github.com/kmalakoff/readdirp-walk#readme",
+  "dependencies": {
+    "walk-filtered": "^0.3.0",
+    "micromatch": "^2.3.5"
+  },
+  "devDependencies": {
+    "nave": "^0.5.3",
+    "tap": "^1.4.1",
+    "through2": "^2.0.0"
+  }
+}
