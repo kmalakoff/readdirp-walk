@@ -64,6 +64,7 @@ module.exports = function(options, fileCallback, callback) {
     realRoot = _realRoot;
 
     var walkOptions = {preStat: true, stat: options.lstat ? 'lstat' : 'stat', filter: filter};
+    if (options.concurrency) walkOptions.concurrency = options.concurrency; // extend API for concurrency
     walk(realRoot, walkOptions, callback);
   });
 

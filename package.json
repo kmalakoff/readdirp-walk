@@ -1,6 +1,6 @@
 {
   "name": "readdirp-walk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/kmalakoff/readdirp-walk#readme",
   "dependencies": {
-    "walk-filtered": "^0.3.0",
-    "micromatch": "^2.3.5"
+    "micromatch": "^2.3.5",
+    "walk-filtered": "^0.4.0"
   },
   "devDependencies": {
     "nave": "^0.5.3",
