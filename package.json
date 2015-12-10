@@ -1,7 +1,7 @@
 {
   "name": "readdirp-walk",
-  "version": "1.4.0",
-  "description": "",
+  "version": "1.5.0",
+  "description": "An optimized readdirp-compliant directory walker that gives you control over concurrency and performance tradeoffs",
   "main": "index.js",
   "scripts": {
     "test-main": "(cd test && set -e; for t in ./*.js; do node $t; done)",
