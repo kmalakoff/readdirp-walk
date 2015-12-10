@@ -46,13 +46,13 @@ module.exports = function(options, fileCallback, callback) {
     return data;
   }
 
-  function filter(path, stat) {
-    var data = toData(path, stat);
+  function filter(path, stats) {
+    var data = toData(path, stats);
     if (data.depth > depth + 1) return false;
-    var keep = !path.length || (stat.isDirectory() ? directoryFilter(data, stat) : fileFilter(data, stat));
+    var keep = !path.length || (stats.isDirectory() ? directoryFilter(data, stats) : fileFilter(data, stats));
     if (keep && path) {
       emitter.emit('data', data);
-      !fileCallback || stat.isDirectory() || fileCallback(data);
+      !fileCallback || stats.isDirectory() || fileCallback(data);
       !results || addResult(data);
     }
     return keep;
@@ -63,7 +63,7 @@ module.exports = function(options, fileCallback, callback) {
     if (err) return callback(err);
     realRoot = _realRoot;
 
-    var walkOptions = {includeStat: true, stat: options.lstat ? 'lstat' : 'stat'};
+    var walkOptions = {stats: true, stat: options.lstat ? 'lstat' : 'stat'};
     if (options.concurrency) walkOptions.concurrency = options.concurrency; // extend API for concurrency
     walk(realRoot, filter, walkOptions, callback);
   });
