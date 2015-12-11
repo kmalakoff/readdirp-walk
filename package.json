@@ -1,6 +1,6 @@
 {
   "name": "readdirp-walk",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "An optimized readdirp-compliant directory walker that gives you control over concurrency and performance tradeoffs",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/kmalakoff/readdirp-walk#readme",
   "dependencies": {
+    "eventemitter3": "^1.1.1",
     "micromatch": "^2.3.5",
     "walk-filtered": "^0.8.0"
   },

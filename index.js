@@ -1,6 +1,6 @@
 var fs = require('fs');
 var sysPath = require('path');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('eventemitter3');
 var walk = require('walk-filtered');
 var micromatch = require('micromatch');
 
