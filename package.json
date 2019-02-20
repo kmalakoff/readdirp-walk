@@ -1,6 +1,6 @@
 {
   "name": "readdirp-walk",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "An optimized readdirp-compliant directory walker that gives you control over concurrency and performance tradeoffs",
   "main": "readdirp.js",
   "scripts": {
