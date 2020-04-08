@@ -2,12 +2,11 @@
 
 const fs = require('fs');
 const { Readable } = require('stream');
-const sysPath = require('path');
+const path = require('path');
 const { promisify } = require('util');
 const picomatch = require('picomatch');
+const Iterator = require('fs-iterator');
 
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
 const lstat = promisify(fs.lstat);
 const realpath = promisify(fs.realpath);
 
@@ -28,15 +27,15 @@ const FILE_DIR_TYPE = 'files_directories';
 const EVERYTHING_TYPE = 'all';
 const ALL_TYPES = [FILE_TYPE, DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE];
 
-const isNormalFlowError = error => NORMAL_FLOW_ERRORS.has(error.code);
+const isNormalFlowError = (error) => NORMAL_FLOW_ERRORS.has(error.code);
 
-const normalizeFilter = filter => {
+const normalizeFilter = (filter) => {
   if (filter === undefined) return;
   if (typeof filter === 'function') return filter;
 
   if (typeof filter === 'string') {
     const glob = picomatch(filter.trim());
-    return entry => glob(entry.basename);
+    return (entry) => glob(entry.basename);
   }
 
   if (Array.isArray(filter)) {
@@ -53,12 +52,11 @@ const normalizeFilter = filter => {
 
     if (negative.length > 0) {
       if (positive.length > 0) {
-        return entry =>
-          positive.some(f => f(entry.basename)) && !negative.some(f => f(entry.basename));
+        return (entry) => positive.some((f) => f(entry.basename)) && !negative.some((f) => f(entry.basename));
       }
-      return entry => !negative.some(f => f(entry.basename));
+      return (entry) => !negative.some((f) => f(entry.basename));
     }
-    return entry => positive.some(f => f(entry.basename));
+    return (entry) => positive.some((f) => f(entry.basename));
   }
 };
 
@@ -73,7 +71,7 @@ class ReaddirpStream extends Readable {
       type: FILE_TYPE,
       lstat: false,
       depth: 2147483648,
-      alwaysStat: false
+      alwaysStat: false,
     };
   }
 
@@ -81,7 +79,7 @@ class ReaddirpStream extends Readable {
     super({
       objectMode: true,
       autoDestroy: true,
-      highWaterMark: options.highWaterMark || 4096
+      highWaterMark: options.highWaterMark || 4096,
     });
     const opts = { ...ReaddirpStream.defaultOptions, ...options };
     const { root, type } = opts;
@@ -89,27 +87,29 @@ class ReaddirpStream extends Readable {
     this._fileFilter = normalizeFilter(opts.fileFilter);
     this._directoryFilter = normalizeFilter(opts.directoryFilter);
 
-    const statMethod = opts.lstat ? lstat : stat;
-    // Use bigint stats if it's windows and stat() supports options (node 10+).
-    if (process.platform === 'win32' && stat.length === 3) {
-      this._stat = path => statMethod(path, { bigint: true });
-    } else {
-      this._stat = statMethod;
-    }
-
-    this._maxDepth = opts.depth;
     this._wantsDir = [DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
     this._wantsFile = [FILE_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
     this._wantsEverything = type === EVERYTHING_TYPE;
-    this._root = sysPath.resolve(root);
-    this._isDirent = ('Dirent' in fs) && !opts.alwaysStat;
+    this._root = path.resolve(root);
+    this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
     this._statsProp = this._isDirent ? 'dirent' : 'stats';
-    this._rdOptions = { encoding: 'utf8', withFileTypes: this._isDirent };
 
-    // Launch stream with one parent, the root dir.
-    this.parents = [this._exploreDir(root, 1)];
-    this.reading = false;
-    this.parent = undefined;
+    const iteratorOptions = {
+      stat: opts.lstat ? 'lstat' : 'stat',
+      alwaysStat: opts.alwaysStat,
+      depth: opts.depth,
+      filter: async (entry) => {
+        entry[this._statsProp] = entry.stats;
+        entry.entryType = await this._getEntryType(entry);
+        if (entry.entryType === 'directory') {
+          return this._directoryFilter(entry);
+        }
+        if (entry.entryType === 'file' || this._includeAsFile(entry)) {
+          return this._fileFilter(entry);
+        }
+      },
+    };
+    this.iterator = new Iterator(root, iteratorOptions);
   }
 
   async _read(batch) {
@@ -118,38 +118,22 @@ class ReaddirpStream extends Readable {
 
     try {
       while (!this.destroyed && batch > 0) {
-        const { path, depth, files = [] } = this.parent || {};
-
-        if (files.length > 0) {
-          const slice = files.splice(0, batch).map(dirent => this._formatEntry(dirent, path));
-          for (const entry of await Promise.all(slice)) {
-            if (this.destroyed) return;
-
-            const entryType = await this._getEntryType(entry);
-            if (entryType === 'directory' && this._directoryFilter(entry)) {
-              if (depth <= this._maxDepth) {
-                this.parents.push(this._exploreDir(entry.fullPath, depth + 1));
-              }
-
-              if (this._wantsDir) {
-                this.push(entry);
-                batch--;
-              }
-            } else if ((entryType === 'file' || this._includeAsFile(entry)) && this._fileFilter(entry)) {
-              if (this._wantsFile) {
-                this.push(entry);
-                batch--;
-              }
-            }
-          }
-        } else {
-          const parent = this.parents.pop();
-          if (!parent) {
+        try {
+          const entry = await this.iterator.next();
+          if (this.destroyed) break;
+          if (!entry) {
             this.push(null);
             break;
           }
-          this.parent = await parent;
-          if (this.destroyed) return;
+
+          if (entry.entryType === 'directory' && !this._wantsDir) continue;
+          else if ((entry.entryType === 'file' || this._includeAsFile(entry)) && !this._wantsFile) continue;
+
+          this.push(entry);
+          batch--;
+        } catch (error) {
+          this._onError(error);
+          continue;
         }
       }
     } catch (error) {
@@ -157,29 +141,6 @@ class ReaddirpStream extends Readable {
     } finally {
       this.reading = false;
     }
-  }
-
-  async _exploreDir(path, depth) {
-    let files;
-    try {
-      files = await readdir(path, this._rdOptions);
-    } catch (error) {
-      this._onError(error);
-    }
-    return {files, depth, path};
-  }
-
-  async _formatEntry(dirent, path) {
-    let entry;
-    try {
-      const basename = this._isDirent ? dirent.name : dirent;
-      const fullPath = sysPath.resolve(sysPath.join(path, basename));
-      entry = {path: sysPath.relative(this._root, fullPath), fullPath, basename};
-      entry[this._statsProp] = this._isDirent ? dirent : await this._stat(fullPath);
-    } catch (err) {
-      this._onError(err);
-    }
-    return entry;
   }
 
   _onError(err) {
@@ -262,9 +223,9 @@ const readdirpPromise = (root, options = {}) => {
   return new Promise((resolve, reject) => {
     const files = [];
     readdirp(root, options)
-      .on('data', entry => files.push(entry))
+      .on('data', (entry) => files.push(entry))
       .on('end', () => resolve(files))
-      .on('error', error => reject(error));
+      .on('error', (error) => reject(error));
   });
 };
 
