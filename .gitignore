@@ -15,3 +15,8 @@ pids
 logs
 results
 npm-debug.log
+
+/benchmark/node_modules/
+/compatibility/node_modules/
+*.heapsnapshot
+*.0x

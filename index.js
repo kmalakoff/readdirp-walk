@@ -52,7 +52,9 @@ const normalizeFilter = (filter) => {
 
     if (negative.length > 0) {
       if (positive.length > 0) {
-        return (entry) => positive.some((f) => f(entry.basename)) && !negative.some((f) => f(entry.basename));
+        return (entry) =>
+          positive.some((f) => f(entry.basename)) &&
+          !negative.some((f) => f(entry.basename));
       }
       return (entry) => !negative.some((f) => f(entry.basename));
     }
@@ -88,26 +90,35 @@ class ReaddirpStream extends Readable {
     this._directoryFilter = normalizeFilter(opts.directoryFilter);
 
     this._wantsDir = [DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
-    this._wantsFile = [FILE_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
+    this._wantsFile = [FILE_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(
+      type
+    );
     this._wantsEverything = type === EVERYTHING_TYPE;
     this._root = path.resolve(root);
     this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
     this._statsProp = this._isDirent ? 'dirent' : 'stats';
 
     this.highWaterMark = options.highWaterMark || 4096;
-    const iteratorOptions = {
+    this.filter = async (entry) => {
+      entry[this._statsProp] = entry.stats;
+      entry.entryType = await this._getEntryType(entry);
+      if (entry.entryType === 'directory') return this._directoryFilter(entry);
+      if (entry.entryType === 'file' || this._includeAsFile(entry))
+        return this._fileFilter(entry);
+      return true;
+    };
+    this.iterator = new Iterator(root, {
       stat: opts.lstat ? 'lstat' : 'stat',
       alwaysStat: opts.alwaysStat,
       depth: opts.depth,
-      filter: async (entry) => {
-        entry[this._statsProp] = entry.stats;
-        entry.entryType = await this._getEntryType(entry);
-        if (entry.entryType === 'directory') return this._directoryFilter(entry);
-        if (entry.entryType === 'file' || this._includeAsFile(entry)) return this._fileFilter(entry);
-        return true;
-      },
-    };
-    this.iterator = new Iterator(root, iteratorOptions);
+      filter: this.filter.bind(this),
+      error: this._onError.bind(this),
+    });
+  }
+
+  destroy(err) {
+    super.destroy(err);
+    if (!this.iterator.destroyed) this.iterator.destroy();
   }
 
   async _read(batch) {
@@ -115,16 +126,26 @@ class ReaddirpStream extends Readable {
     this.reading = true;
 
     try {
-      const done = await this.iterator.each(
-        (error, entry) => {
-          if (this.destroyed) return false;
-          if (error) return this._onError(error);
-          if (entry.entryType === 'directory' && !this._wantsDir) return true;
-          if ((entry.entryType === 'file' || this._includeAsFile(entry)) && !this._wantsFile) return true;
+      const done = await this.iterator.forEach(
+        async (entry) => {
+          if (this.destroyed) return;
+          if (!entry.entryType && !(await this.filter(entry))) return;
+          if (
+            entry.entryType === 'directory' &&
+            (!entry.basename || !this._wantsDir)
+          )
+            return;
+          if (
+            (entry.entryType === 'file' || this._includeAsFile(entry)) &&
+            !this._wantsFile
+          )
+            return;
           this.push(entry);
-          return true;
         },
-        { limit: batch, concurrency: this.highWaterMark }
+        {
+          limit: batch,
+          concurrency: this.highWaterMark,
+        }
       );
       if (done) this.push(null);
     } catch (error) {
@@ -137,10 +158,10 @@ class ReaddirpStream extends Readable {
   _onError(err) {
     if (isNormalFlowError(err) && !this.destroyed) {
       this.emit('warn', err);
-      return false;
+      return true;
     }
-    this.destroy(err);
-    return true;
+    if (!this.destroyed) this.destroy(err);
+    return false;
   }
 
   async _getEntryType(entry) {
@@ -200,11 +221,17 @@ const readdirp = (root, options = {}) => {
   if (type === 'both') type = FILE_DIR_TYPE; // backwards-compatibility
   if (type) options.type = type;
   if (!root) {
-    throw new Error('readdirp: root argument is required. Usage: readdirp(root, options)');
+    throw new Error(
+      'readdirp: root argument is required. Usage: readdirp(root, options)'
+    );
   } else if (typeof root !== 'string') {
-    throw new TypeError('readdirp: root argument must be a string. Usage: readdirp(root, options)');
+    throw new TypeError(
+      'readdirp: root argument must be a string. Usage: readdirp(root, options)'
+    );
   } else if (type && !ALL_TYPES.includes(type)) {
-    throw new Error(`readdirp: Invalid type passed. Use one of ${ALL_TYPES.join(', ')}`);
+    throw new Error(
+      `readdirp: Invalid type passed. Use one of ${ALL_TYPES.join(', ')}`
+    );
   }
 
   options.root = root;

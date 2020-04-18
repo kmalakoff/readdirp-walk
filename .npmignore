@@ -1,0 +1,7 @@
+.vscode/
+compatibility/
+benchmark/
+test/
+.eslintrc.js
+.prettierignore
+.prettierrc
