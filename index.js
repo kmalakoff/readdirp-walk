@@ -98,7 +98,7 @@ class ReaddirpStream extends Readable {
     this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
     this._statsProp = this._isDirent ? 'dirent' : 'stats';
 
-    this.highWaterMark = options.highWaterMark || 4096;
+    this.concurrency = options.concurrency || 36;
     this.filter = async (entry) => {
       entry[this._statsProp] = entry.stats;
       entry.entryType = await this._getEntryType(entry);
@@ -144,7 +144,7 @@ class ReaddirpStream extends Readable {
         },
         {
           limit: batch,
-          concurrency: this.highWaterMark,
+          concurrency: this.concurrency,
         }
       );
       if (done) this.push(null);
