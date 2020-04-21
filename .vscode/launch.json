@@ -9,25 +9,30 @@
       "request": "launch",
       "name": "Mocha All",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": ["--timeout", "999999", "--colors", "${workspaceFolder}/test/spec/**/*.test.js"],
+      "args": [
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceFolder}/test/spec/**/*.test.js"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Memory Benchmark",
-      "cwd": "${workspaceFolder}/benchmark",
-      "program": "${workspaceFolder}/benchmark/memory/index.js",
+      "name": "Memory Performance",
+      "cwd": "${workspaceFolder}/performance",
+      "program": "${workspaceFolder}/performance/memory/index.js",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Operations Benchmark",
-      "cwd": "${workspaceFolder}/benchmark",
-      "program": "${workspaceFolder}/benchmark/operations/index.js",
+      "name": "Operations Performance",
+      "cwd": "${workspaceFolder}/performance",
+      "program": "${workspaceFolder}/performance/operations/index.js",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }

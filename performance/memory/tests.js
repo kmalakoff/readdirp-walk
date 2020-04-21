@@ -3,17 +3,15 @@
 const BenchmarkSuite = require('benchmark-suite');
 
 module.exports = async function run({ readdirp, version, testOptions }, dir) {
-  console.log('****************\n');
-  console.log(`Running: ${version}`);
-  console.log('----------------');
-
-  const suite = new BenchmarkSuite(`ReaddirpStream ${dir}`, 'Operations');
+  const suite = new BenchmarkSuite(`ReaddirpStream ${  version}`, 'Memory');
 
   for (const test of testOptions) {
-    suite.add(`${version}-${test.name}`, () => {
+    suite.add(`${test.name}`, (fn) => {
       return new Promise((resolve, reject) => {
         let stream = new readdirp.ReaddirpStream(dir, test.options);
-        stream.on('data', () => {});
+        stream.on('data', async () => {
+          await fn();
+        });
         stream.on('error', (err) => {
           if (!stream) return;
           stream.destroy();
@@ -33,25 +31,22 @@ module.exports = async function run({ readdirp, version, testOptions }, dir) {
   suite.on('cycle', (results) => {
     for (const key in results)
       console.log(
-        `${results[key].name} (${key}) x ${suite.formatStats(
+        `${results[key].name.padStart(8, ' ')}| ${suite.formatStats(
           results[key].stats
-        )}`
+        )} - ${key}`
       );
   });
   suite.on('complete', (results) => {
-    console.log('----------------');
-    console.log('Fastest');
-    console.log('----------------');
+    console.log('-----Largest-----');
     for (const key in results)
       console.log(
-        `${results[key].name} (${key}) x ${suite.formatStats(
+        `${results[key].name.padStart(8, ' ')}| ${suite.formatStats(
           results[key].stats
-        )}`
+        )} - ${key}`
       );
-    console.log('****************\n');
   });
 
-  console.log(`Comparing ${suite.name}`);
-  await suite.run({ time: 1000 });
-  console.log('****************\n');
+  console.log(`----------${  suite.name  }----------`);
+  await suite.run({ time: 1000 }); //, heapdumpTrigger: 1024 * 100 });
+  console.log('');
 };
