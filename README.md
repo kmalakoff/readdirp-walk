@@ -8,4 +8,4 @@ If you are looking for even more performance and to roll your own scanning algor
 
 **Aditional Options**
 
-- number: concurrency - option to set the maximum number of concurrent fs operations to strike a balance between speed and memory. (default: 36 - based on performance benchmarking with readdirp to beat performance and have a similar upper limit on memory).
+- number: concurrency - option to set the maximum number of concurrent fs operations to strike a balance between speed and memory. (default: based on performance benchmarking).
