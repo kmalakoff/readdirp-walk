@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
-const fs = require("fs");
-const { Readable } = require("stream");
-const path = require("path");
-const { promisify } = require("util");
-const picomatch = require("picomatch");
-const Iterator = require("fs-iterator");
+const fs = require('fs');
+const { Readable } = require('stream');
+const path = require('path');
+const { promisify } = require('util');
+const picomatch = require('picomatch');
+const Iterator = require('fs-iterator');
 
 const lstat = promisify(fs.lstat);
 const realpath = promisify(fs.realpath);
@@ -19,21 +19,21 @@ const realpath = promisify(fs.realpath);
  * @property {String} basename
  */
 
-const BANG = "!";
-const NORMAL_FLOW_ERRORS = new Set(["ENOENT", "EPERM", "EACCES", "ELOOP"]);
-const FILE_TYPE = "files";
-const DIR_TYPE = "directories";
-const FILE_DIR_TYPE = "files_directories";
-const EVERYTHING_TYPE = "all";
+const BANG = '!';
+const NORMAL_FLOW_ERRORS = new Set(['ENOENT', 'EPERM', 'EACCES', 'ELOOP']);
+const FILE_TYPE = 'files';
+const DIR_TYPE = 'directories';
+const FILE_DIR_TYPE = 'files_directories';
+const EVERYTHING_TYPE = 'all';
 const ALL_TYPES = [FILE_TYPE, DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE];
 
 const isNormalFlowError = (error) => NORMAL_FLOW_ERRORS.has(error.code);
 
 const normalizeFilter = (filter) => {
   if (filter === undefined) return;
-  if (typeof filter === "function") return filter;
+  if (typeof filter === 'function') return filter;
 
-  if (typeof filter === "string") {
+  if (typeof filter === 'string') {
     const glob = picomatch(filter.trim());
     return (entry) => glob(entry.basename);
   }
@@ -65,7 +65,7 @@ const normalizeFilter = (filter) => {
 class ReaddirpStream extends Readable {
   static get defaultOptions() {
     return {
-      root: ".",
+      root: '.',
       /* eslint-disable no-unused-vars */
       fileFilter: (path) => true,
       directoryFilter: (path) => true,
@@ -95,20 +95,20 @@ class ReaddirpStream extends Readable {
     );
     this._wantsEverything = type === EVERYTHING_TYPE;
     this._root = path.resolve(root);
-    this._isDirent = "Dirent" in fs && !opts.alwaysStat;
-    this._statsProp = this._isDirent ? "dirent" : "stats";
+    this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
+    this._statsProp = this._isDirent ? 'dirent' : 'stats';
 
-    this.concurrency = options.concurrency || 40;
+    this.concurrency = options.concurrency || Infinity;
     this.filter = async (entry) => {
       entry[this._statsProp] = entry.stats;
       entry.entryType = await this._getEntryType(entry);
-      if (entry.entryType === "directory") return this._directoryFilter(entry);
-      if (entry.entryType === "file" || this._includeAsFile(entry))
+      if (entry.entryType === 'directory') return this._directoryFilter(entry);
+      if (entry.entryType === 'file' || this._includeAsFile(entry))
         return this._fileFilter(entry);
       return true;
     };
     this.iterator = new Iterator(root, {
-      stat: opts.lstat ? "lstat" : "stat",
+      stat: opts.lstat ? 'lstat' : 'stat',
       stats: opts.alwaysStat,
       depth: opts.depth,
       filter: this.filter.bind(this),
@@ -131,12 +131,12 @@ class ReaddirpStream extends Readable {
           if (this.destroyed) return;
           if (!entry.entryType && !(await this.filter(entry))) return;
           if (
-            entry.entryType === "directory" &&
+            entry.entryType === 'directory' &&
             (!entry.basename || !this._wantsDir)
           )
             return;
           if (
-            (entry.entryType === "file" || this._includeAsFile(entry)) &&
+            (entry.entryType === 'file' || this._includeAsFile(entry)) &&
             !this._wantsFile
           )
             return;
@@ -157,7 +157,7 @@ class ReaddirpStream extends Readable {
 
   _onError(err) {
     if (isNormalFlowError(err) && !this.destroyed) {
-      this.emit("warn", err);
+      this.emit('warn', err);
       return true;
     }
     if (!this.destroyed) this.destroy(err);
@@ -172,20 +172,20 @@ class ReaddirpStream extends Readable {
       return;
     }
     if (stats.isFile()) {
-      return "file";
+      return 'file';
     }
     if (stats.isDirectory()) {
-      return "directory";
+      return 'directory';
     }
     if (stats && stats.isSymbolicLink()) {
       try {
         const entryRealPath = await realpath(entry.fullPath);
         const entryRealPathStats = await lstat(entryRealPath);
         if (entryRealPathStats.isFile()) {
-          return "file";
+          return 'file';
         }
         if (entryRealPathStats.isDirectory()) {
-          return "directory";
+          return 'directory';
         }
       } catch (error) {
         this._onError(error);
@@ -218,19 +218,19 @@ class ReaddirpStream extends Readable {
  */
 const readdirp = (root, options = {}) => {
   let type = options.entryType || options.type;
-  if (type === "both") type = FILE_DIR_TYPE; // backwards-compatibility
+  if (type === 'both') type = FILE_DIR_TYPE; // backwards-compatibility
   if (type) options.type = type;
   if (!root) {
     throw new Error(
-      "readdirp: root argument is required. Usage: readdirp(root, options)"
+      'readdirp: root argument is required. Usage: readdirp(root, options)'
     );
-  } else if (typeof root !== "string") {
+  } else if (typeof root !== 'string') {
     throw new TypeError(
-      "readdirp: root argument must be a string. Usage: readdirp(root, options)"
+      'readdirp: root argument must be a string. Usage: readdirp(root, options)'
     );
   } else if (type && !ALL_TYPES.includes(type)) {
     throw new Error(
-      `readdirp: Invalid type passed. Use one of ${ALL_TYPES.join(", ")}`
+      `readdirp: Invalid type passed. Use one of ${ALL_TYPES.join(', ')}`
     );
   }
 
@@ -242,9 +242,9 @@ const readdirpPromise = (root, options = {}) => {
   return new Promise((resolve, reject) => {
     const files = [];
     readdirp(root, options)
-      .on("data", (entry) => files.push(entry))
-      .on("end", () => resolve(files))
-      .on("error", (error) => reject(error));
+      .on('data', (entry) => files.push(entry))
+      .on('end', () => resolve(files))
+      .on('error', (error) => reject(error));
   });
 };
 

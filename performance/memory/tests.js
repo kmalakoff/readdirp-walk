@@ -3,7 +3,7 @@
 const BenchmarkSuite = require('benchmark-suite');
 
 module.exports = async function run({ readdirp, version, testOptions }, dir) {
-  const suite = new BenchmarkSuite(`ReaddirpStream ${  version}`, 'Memory');
+  const suite = new BenchmarkSuite(`ReaddirpStream ${version}`, 'Memory');
 
   for (const test of testOptions) {
     suite.add(`${test.name}`, (fn) => {
@@ -46,7 +46,7 @@ module.exports = async function run({ readdirp, version, testOptions }, dir) {
       );
   });
 
-  console.log(`----------${  suite.name  }----------`);
-  await suite.run({ time: 1000 }); //, heapdumpTrigger: 1024 * 100 });
+  console.log(`----------${suite.name}----------`);
+  await suite.run({ time: 1000 }); //, heapdumpTrigger: 1024 * 10 });
   console.log('');
 };
