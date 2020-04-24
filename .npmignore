@@ -1,7 +1,7 @@
 .vscode/
-compatibility/
-performance/
+examples/
 test/
+.eslintignore
 .eslintrc.js
 .prettierignore
 .prettierrc
