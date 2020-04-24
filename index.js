@@ -98,7 +98,6 @@ class ReaddirpStream extends Readable {
     this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
     this._statsProp = this._isDirent ? 'dirent' : 'stats';
 
-    this.concurrency = options.concurrency || Infinity;
     this.filter = async (entry) => {
       entry[this._statsProp] = entry.stats;
       entry.entryType = await this._getEntryType(entry);
@@ -107,10 +106,11 @@ class ReaddirpStream extends Readable {
         return this._fileFilter(entry);
       return true;
     };
+
     this.iterator = new Iterator(root, {
-      stat: opts.lstat ? 'lstat' : 'stat',
-      stats: opts.alwaysStat,
+      lstat: opts.lstat,
       depth: opts.depth,
+      alwaysStat: opts.alwaysStat,
       filter: this.filter.bind(this),
       error: this._onError.bind(this),
     });
@@ -126,28 +126,27 @@ class ReaddirpStream extends Readable {
     this.reading = true;
 
     try {
-      const done = await this.iterator.forEach(
-        async (entry) => {
-          if (this.destroyed) return;
-          if (!entry.entryType && !(await this.filter(entry))) return;
-          if (
-            entry.entryType === 'directory' &&
-            (!entry.basename || !this._wantsDir)
-          )
-            return;
-          if (
-            (entry.entryType === 'file' || this._includeAsFile(entry)) &&
-            !this._wantsFile
-          )
-            return;
-          this.push(entry);
-        },
-        {
-          limit: batch,
-          concurrency: this.concurrency,
+      while (batch > 0) {
+        const done = await this.iterator.forEach(
+          async (entry) => {
+            if (
+              !this.destroyed &&
+              ((entry.entryType === 'directory' && this._wantsDir) ||
+                (entry.entryType === 'file' && this._wantsFile))
+            ) {
+              batch--;
+              this.push(entry);
+            }
+          },
+          {
+            limit: batch,
+          }
+        );
+        if (done) {
+          this.push(null);
+          break;
         }
-      );
-      if (done) this.push(null);
+      }
     } catch (error) {
       this.destroy(error);
     } finally {

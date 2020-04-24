@@ -8,7 +8,9 @@ module.exports = async function run({ readdirp, version, testOptions }, dir) {
   for (const test of testOptions) {
     suite.add(`${test.name}`, (fn) => {
       return new Promise((resolve, reject) => {
-        let stream = new readdirp.ReaddirpStream(dir, test.options);
+        let stream = new readdirp.ReaddirpStream(
+          Object.assign({ root: dir }, test.options)
+        );
         stream.on('data', async () => {
           await fn();
         });
@@ -31,7 +33,7 @@ module.exports = async function run({ readdirp, version, testOptions }, dir) {
   suite.on('cycle', (results) => {
     for (const key in results)
       console.log(
-        `${results[key].name.padStart(8, ' ')}| ${suite.formatStats(
+        `${results[key].name.padStart(10, ' ')}| ${suite.formatStats(
           results[key].stats
         )} - ${key}`
       );
@@ -40,7 +42,7 @@ module.exports = async function run({ readdirp, version, testOptions }, dir) {
     console.log('-----Largest-----');
     for (const key in results)
       console.log(
-        `${results[key].name.padStart(8, ' ')}| ${suite.formatStats(
+        `${results[key].name.padStart(10, ' ')}| ${suite.formatStats(
           results[key].stats
         )} - ${key}`
       );

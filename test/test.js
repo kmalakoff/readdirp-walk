@@ -381,7 +381,7 @@ describe('various', () => {
       entry.should.containSubset(formatEntry(created[index], currPath))
     );
   });
-  it.skip('should emit warning for missing file', async () => {
+  it('should emit warning for missing file', async () => {
     // readdirp() is initialized on some big root directory
     // readdirp() receives path a/b/c to its queue
     // readdirp is reading something else
@@ -403,7 +403,7 @@ describe('various', () => {
     stream.resume();
     await Promise.race([waitForEnd(stream), delay(2000)]);
     isWarningCalled.should.equals(true);
-  }); // }).timeout(4000);
+  }).timeout(4000);
   it('should emit warning for file with strict permission', async () => {
     // Windows doesn't throw permission error if you access permitted directory
     if (isWindows) {
