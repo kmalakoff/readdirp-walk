@@ -118,7 +118,10 @@ class ReaddirpStream extends Readable {
 
   destroy(err) {
     super.destroy(err);
-    if (!this.iterator.destroyed) this.iterator.destroy();
+    if (this.iterator) {
+      this.iterator.destroy();
+      this.iterator = null;
+    }
   }
 
   async _read(batch) {
@@ -126,7 +129,7 @@ class ReaddirpStream extends Readable {
     this.reading = true;
 
     try {
-      while (batch > 0) {
+      while (!this.destroyed && batch > 0) {
         const done = await this.iterator.forEach(
           async (entry) => {
             if (

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // const CONCURRENCIES = [10000];
 // const CONCURRENCIES = [100];
@@ -11,11 +11,11 @@ const TESTS_OPTIONS = [];
 for (const alwaysStat of ALWAYS_STATS) {
   for (const concurrency of CONCURRENCIES) {
     TESTS_OPTIONS.push({
-      name: `${concurrency}-${alwaysStat ? "t" : "f"}`,
+      name: `${concurrency}-${alwaysStat ? 't' : 'f'}`,
       options: { highWaterMark: concurrency, alwaysStat },
     });
   }
 }
-TESTS_OPTIONS.push({ name: "default" });
+TESTS_OPTIONS.push({ name: 'default' });
 
 module.exports = TESTS_OPTIONS;
