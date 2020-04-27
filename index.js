@@ -20,14 +20,11 @@ const realpath = promisify(fs.realpath);
  */
 
 const BANG = '!';
-const NORMAL_FLOW_ERRORS = new Set(['ENOENT', 'EPERM', 'EACCES', 'ELOOP']);
 const FILE_TYPE = 'files';
 const DIR_TYPE = 'directories';
 const FILE_DIR_TYPE = 'files_directories';
 const EVERYTHING_TYPE = 'all';
 const ALL_TYPES = [FILE_TYPE, DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE];
-
-const isNormalFlowError = (error) => NORMAL_FLOW_ERRORS.has(error.code);
 
 const normalizeFilter = (filter) => {
   if (filter === undefined) return;
@@ -149,7 +146,8 @@ class ReaddirpStream extends Readable {
   }
 
   _onError(err) {
-    if (isNormalFlowError(err) && !this.destroyed) {
+    if (this.destroyed) return false;
+    if (~Iterator.EXPECTED_ERRORS.indexOf(err.code)) {
       this.emit('warn', err);
       return true;
     }
