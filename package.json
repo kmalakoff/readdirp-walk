@@ -1,6 +1,6 @@
 {
   "name": "readdirp-walk",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "An optimized readdirp-compliant directory walker that gives you control over concurrency and performance tradeoffs",
   "main": "index.js",
   "engines": {
@@ -43,7 +43,7 @@
   },
   "homepage": "https://github.com/kmalakoff/readdirp-walk#readme",
   "dependencies": {
-    "fs-iterator": "^2.6.0",
+    "fs-iterator": "^3.0.1",
     "picomatch": "^2.2.2"
   },
   "devDependencies": {
