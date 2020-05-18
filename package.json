@@ -50,13 +50,13 @@
     "picomatch": "^2.2.2"
   },
   "devDependencies": {
-    "@types/node": "^13",
+    "@types/node": "^14",
     "chai": "^4.2",
     "chai-subset": "^1.6",
-    "dtslint": "^3.5.2",
+    "dtslint": "^3.6.2",
     "eslint": "^7.0.0",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.3.0",
+    "nvs": "^0.4.0",
     "nyc": "^15.0.1",
     "rimraf": "^3.0.2"
   },

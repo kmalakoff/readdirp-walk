@@ -21,10 +21,10 @@ const realpath = promisify(fs.realpath);
 
 const BANG = '!';
 const FILE_TYPE = 'files';
-const DIR_TYPE = 'directories';
-const FILE_DIR_TYPE = 'files_directories';
+const TEST_DIR_TYPE = 'directories';
+const FILE_TEST_DIR_TYPE = 'files_directories';
 const EVERYTHING_TYPE = 'all';
-const ALL_TYPES = [FILE_TYPE, DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE];
+const ALL_TYPES = [FILE_TYPE, TEST_DIR_TYPE, FILE_TEST_DIR_TYPE, EVERYTHING_TYPE];
 
 const normalizeFilter = (filter) => {
   if (filter === undefined) return;
@@ -84,8 +84,8 @@ class ReaddirpStream extends Readable {
     this._fileFilter = normalizeFilter(opts.fileFilter);
     this._directoryFilter = normalizeFilter(opts.directoryFilter);
 
-    this._wantsDir = [DIR_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
-    this._wantsFile = [FILE_TYPE, FILE_DIR_TYPE, EVERYTHING_TYPE].includes(type);
+    this._wantsDir = [TEST_DIR_TYPE, FILE_TEST_DIR_TYPE, EVERYTHING_TYPE].includes(type);
+    this._wantsFile = [FILE_TYPE, FILE_TEST_DIR_TYPE, EVERYTHING_TYPE].includes(type);
     this._wantsEverything = type === EVERYTHING_TYPE;
     this._root = path.resolve(root);
     this._isDirent = 'Dirent' in fs && !opts.alwaysStat;
@@ -213,7 +213,7 @@ class ReaddirpStream extends Readable {
  */
 const readdirp = (root, options = {}) => {
   let type = options.entryType || options.type;
-  if (type === 'both') type = FILE_DIR_TYPE; // backwards-compatibility
+  if (type === 'both') type = FILE_TEST_DIR_TYPE; // backwards-compatibility
   if (type) options.type = type;
   if (!root) {
     throw new Error('readdirp: root argument is required. Usage: readdirp(root, options)');
