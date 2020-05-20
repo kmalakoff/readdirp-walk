@@ -1,5 +1,6 @@
 .vscode/
-examples/
+performance/
+compatibility/
 test/
 .eslintignore
 .eslintrc.js
