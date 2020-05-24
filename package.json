@@ -31,7 +31,6 @@
     "index.d.ts"
   ],
   "scripts": {
-    "compat": "nvs --engines mocha-compat test/test.js",
     "dtslint": "dtslint",
     "format": "eslint --fix --report-unused-disable-directives .",
     "lint": "eslint --report-unused-disable-directives .",
@@ -56,7 +55,6 @@
     "dtslint": "^3.6.4",
     "eslint": "^7.1.0",
     "mocha-compat": "^3.5.5",
-    "nvs": "^0.4.4",
     "nyc": "^15.0.1",
     "rimraf": "^3.0.2"
   },
