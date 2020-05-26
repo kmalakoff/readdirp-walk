@@ -36,7 +36,7 @@
     "lint": "eslint --report-unused-disable-directives .",
     "mocha": "mocha-compat test/test.js",
     "nyc": "nyc",
-    "test": "npm run lint && nyc npm run mocha"
+    "test": "npm run mocha"
   },
   "nyc": {
     "reporter": [
@@ -59,6 +59,6 @@
     "rimraf": "^3.0.2"
   },
   "engines": {
-    "node": ">6"
+    "node": ">=8"
   }
 }
