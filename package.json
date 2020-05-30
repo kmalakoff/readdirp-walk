@@ -52,7 +52,7 @@
     "@types/node": "^14",
     "chai": "^4.2",
     "chai-subset": "^1.6",
-    "dtslint": "^3.6.7",
+    "dtslint": "^3.6.9",
     "eslint": "^7.1.0",
     "mocha-compat": "^3.5.5",
     "nyc": "^15.0.1",
