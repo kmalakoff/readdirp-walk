@@ -100,7 +100,7 @@ describe('symlinks', () => {
   });
 
   it('handles symlinked directories', async () => {
-    const originalPath = path.join(__dirname, 'examples');
+    const originalPath = path.join(__dirname, '..', 'examples');
     const originalFiles = await readdir(originalPath);
     const newPath = path.join(currPath, 'examples');
     await symlink(originalPath, newPath);
