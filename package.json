@@ -37,7 +37,7 @@
     "mocha": "mocha-compat test/test.js",
     "nyc": "nyc",
     "test": "npm run mocha",
-    "prepublish": "dtd \"npm run lint\" \"depcheck --ignores='depcheck'\""
+    "prepublishOnly": "dtd \"npm run lint\" \"depcheck --ignores='depcheck'\""
   },
   "nyc": {
     "reporter": [
