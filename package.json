@@ -36,7 +36,8 @@
     "lint": "eslint --report-unused-disable-directives .",
     "mocha": "mocha-compat test/test.js",
     "nyc": "nyc",
-    "test": "npm run mocha"
+    "test": "npm run mocha",
+    "prepublish": "dtd \"npm run lint\" \"depcheck --ignores='depcheck'\""
   },
   "nyc": {
     "reporter": [
@@ -52,6 +53,8 @@
     "@types/node": "^14",
     "chai": "^4.2",
     "chai-subset": "^1.6",
+    "depcheck": "^0.9.2",
+    "dis-dat": "^0.1.3",
     "dtslint": "^3.6.9",
     "eslint": "^6.8.0",
     "mocha-compat": "^3.5.5",
