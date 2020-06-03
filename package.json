@@ -36,8 +36,8 @@
     "lint": "eslint --report-unused-disable-directives .",
     "mocha": "mocha-compat test/test.js",
     "nyc": "nyc",
-    "test": "npm run mocha",
-    "prepublishOnly": "dtd \"npm run lint\" \"depcheck\""
+    "prepublishOnly": "dtd \"npm run lint\" \"depcheck\"",
+    "test": "npm run mocha"
   },
   "nyc": {
     "reporter": [
