@@ -46,7 +46,7 @@
     ]
   },
   "dependencies": {
-    "fs-iterator": "^4.0.1",
+    "fs-iterator": "^4.0.2",
     "picomatch": "^2.2.2"
   },
   "devDependencies": {
