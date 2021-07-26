@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "benchmark-suite": "^0.1.6",
-    "readdirp": "^3.4.0"
+    "readdirp": "^3.6.0"
   }
 }
