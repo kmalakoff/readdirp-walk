@@ -1,5 +1,5 @@
 {
-  "name": "fs-iterator-operations-testOptions",
+  "name": "readdirp-walk-performance",
   "version": "0.0.0",
   "private": true,
   "description": "Tests",
@@ -15,7 +15,10 @@
     "test": "npm run ops && npm run mem"
   },
   "dependencies": {
-    "benchmark-suite": "^0.1.6",
+    "benchmark-suite": "^0.1.7",
     "readdirp": "^3.6.0"
+  },
+  "engines": {
+    "node": ">=8"
   }
 }
