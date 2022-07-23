@@ -30,6 +30,7 @@
     "lib"
   ],
   "scripts": {
+    "build": "",
     "dtslint": "dtslint",
     "format": "eslint --fix --report-unused-disable-directives .",
     "lint": "eslint --report-unused-disable-directives .",
