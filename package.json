@@ -30,6 +30,7 @@
     "lib"
   ],
   "scripts": {
+    "build": "",
     "dtslint": "dtslint",
     "format": "eslint --fix --report-unused-disable-directives .",
     "lint": "eslint --report-unused-disable-directives .",
@@ -53,7 +54,7 @@
     "chai": "^4.3",
     "chai-subset": "^1.6",
     "depcheck": "^1.4.3",
-    "eslint": "^8.20.0",
+    "eslint": "^8.22.0",
     "mocha-compat": "^3.5.5",
     "nyc": "^15.1.0",
     "rimraf": "^2.7.1"
