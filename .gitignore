@@ -10,6 +10,7 @@
 /coverage/
 /lib-cov/
 /node_modules/
+npm-debug.log
 /test-fixtures/
 pids
 logs
@@ -17,6 +18,8 @@ results
 npm-debug.log
 
 /performance/node_modules/
+npm-debug.log
 /compatibility/node_modules/
+npm-debug.log
 *.heapsnapshot
 *.0x

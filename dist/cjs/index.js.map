@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.mjs"],"sourcesContent":["import {readdirp}from './readdirp.cjs'\n\nexport {promise, ReaddirpStream}from './readdirp.cjs'\nexport default readdirp;\n"],"names":["ReaddirpStream","promise","readdirp"],"mappings":";;;;;;;;;;;IAEiBA,cAAc;eAAdA,2BAAc;;IAC/B,OAAwB;eAAxB;;IADQC,OAAO;eAAPA,oBAAO;;;2BAFO;IAGtB,WAAeC,qBAAQ"}

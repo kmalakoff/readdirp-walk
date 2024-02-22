@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const { Readable } = require('stream');
 const path = require('path');
@@ -62,8 +60,8 @@ class ReaddirpStream extends Readable {
     return {
       root: '.',
       /* eslint-disable no-unused-vars */
-      fileFilter: (path) => true,
-      directoryFilter: (path) => true,
+      fileFilter: (_path) => true,
+      directoryFilter: (_path) => true,
       /* eslint-enable no-unused-vars */
       type: FILE_TYPE,
       lstat: false,
@@ -217,9 +215,11 @@ const readdirp = (root, options = {}) => {
   if (type) options.type = type;
   if (!root) {
     throw new Error('readdirp: root argument is required. Usage: readdirp(root, options)');
-  } else if (typeof root !== 'string') {
+  }
+  if (typeof root !== 'string') {
     throw new TypeError('readdirp: root argument must be a string. Usage: readdirp(root, options)');
-  } else if (type && !ALL_TYPES.includes(type)) {
+  }
+  if (type && !ALL_TYPES.includes(type)) {
     throw new Error(`readdirp: Invalid type passed. Use one of ${ALL_TYPES.join(', ')}`);
   }
 
@@ -237,8 +237,8 @@ const readdirpPromise = (root, options = {}) => {
   });
 };
 
-readdirp.promise = readdirpPromise;
-readdirp.ReaddirpStream = ReaddirpStream;
-readdirp.default = readdirp;
-
-module.exports = readdirp;
+module.exports = {
+  readdirp,
+  promise: readdirpPromise,
+  ReaddirpStream
+}

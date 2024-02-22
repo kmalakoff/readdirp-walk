@@ -1,2 +1,2 @@
-ignores: ["depcheck"]
+ignores: ["readdirp-walk", "depcheck", "ts-dev-stack", "@types/*"]
 ignoreDirs: ["examples"]

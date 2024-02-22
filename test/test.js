@@ -1,15 +1,11 @@
-/* eslint-env mocha */
-
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const { Readable } = require('stream');
-const { promisify } = require('util');
+const promisify = require('util.promisify');
 const chai = require('chai');
 const chaiSubset = require('chai-subset');
 const rimraf = require('rimraf');
-const readdirp = require('..');
+const readdirp = require('readdirp-walk');
 
 chai.use(chaiSubset);
 chai.should();
@@ -120,7 +116,7 @@ describe('symlinks', () => {
     res.should.have.lengthOf(expect.length);
     sort(res, expect).forEach((entry, index) => {
       entry.should.containSubset(formatEntry(expect[index], currPath, false));
-      entry.should.include.own.key('stats');
+      entry.should.have.property('stats');
       if (entry.basename === symlinkName) {
         entry.stats.isSymbolicLink().should.equals(true);
       }
@@ -285,7 +281,7 @@ describe('filtering', () => {
     res.should.have.lengthOf(expect.length);
     sort(res, expect).forEach((entry, index) => {
       entry.should.containSubset(formatEntry(expect[index], currPath));
-      entry.should.include.own.key('stats');
+      entry.should.have.property('stats');
     });
 
     const expect2 = ['a.js', 'b.txt', 'c.js', 'd.js', 'e.rb'];
@@ -296,7 +292,7 @@ describe('filtering', () => {
     res2.should.have.lengthOf(expect2.length);
     sort(res2, expect2).forEach((entry, index) => {
       entry.should.containSubset(formatEntry(expect2[index], currPath));
-      entry.should.include.own.key('stats');
+      entry.should.have.property('stats');
     });
   });
 });
@@ -371,6 +367,7 @@ describe('various', () => {
       });
     await Promise.race([waitForEnd(stream), delay(2000)]);
     isWarningCalled.should.equals(true);
+    fs.chmodSync(permitedDir, 0o777);
   });
   it('should not emit warning after "end" event', async () => {
     // Windows doesn't throw permission error if you access permitted directory
@@ -400,5 +397,6 @@ describe('various', () => {
     await Promise.race([waitForEnd(stream), delay(2000)]);
     isWarningCalled.should.equals(true);
     isEnded.should.equals(true);
+    fs.chmodSync(permitedDir, 0o777);
   });
 });

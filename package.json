@@ -25,40 +25,40 @@
   },
   "license": "MIT",
   "author": "Kevin Malakoff <kmalakoff@gmail.com> (https://github.com/kmalakoff)",
-  "main": "lib/index.js",
+  "type": "commonjs",
+  "main": "dist/cjs/index.js",
+  "types": "dist/types/index.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
-    "dtslint": "dtslint",
-    "format": "eslint --fix --report-unused-disable-directives .",
-    "lint": "eslint --report-unused-disable-directives .",
-    "mocha": "mocha-compat test/test.js",
-    "nyc": "nyc",
-    "prepublishOnly": "npm run lint && depcheck",
-    "test": "npm run mocha",
-    "test:engines": "nvu engines npm test"
-  },
-  "nyc": {
-    "reporter": [
-      "html",
-      "text"
-    ]
+    "build": "tsds build",
+    "deploy": "tsds deploy",
+    "format": "biome check --apply-unsafe src/ test/",
+    "test": "tsds test:node --no-timeouts test/test.js",
+    "test:engines": "nvu engines npm test",
+    "version": "tsds version"
   },
   "dependencies": {
-    "fs-iterator": "^4.1.1",
-    "picomatch": "^2.3.1"
+    "fs-iterator": "^5.0.1",
+    "picomatch": "^4.0.1"
   },
   "devDependencies": {
-    "chai": "^4.3",
+    "@types/mocha": "^10.0.6",
+    "chai": "^1.10.0",
     "chai-subset": "^1.6",
-    "depcheck": "^1.4.3",
-    "eslint": "^8.20.0",
-    "mocha-compat": "^3.5.5",
-    "nyc": "^15.1.0",
-    "rimraf": "^2.7.1"
+    "depcheck": "^1.4.7",
+    "rimraf": "^1.0.9",
+    "ts-dev-stack": "^0.15.3",
+    "util.promisify": "^1.1.2"
   },
   "engines": {
     "node": ">=8"
+  },
+  "tsds": {
+    "source": "src/index.mjs",
+    "targets": [
+      "cjs"
+    ]
   }
 }
