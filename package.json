@@ -49,7 +49,7 @@
     "chai-subset": "^1.6",
     "depcheck": "^1.4.7",
     "rimraf": "^1.0.9",
-    "ts-dev-stack": "^0.15.3",
+    "ts-dev-stack": "^1.18.4",
     "util.promisify": "^1.1.2"
   },
   "engines": {
