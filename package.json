@@ -40,7 +40,7 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "fs-iterator": "^5.0.1",
+    "fs-iterator": "^6.1.5",
     "picomatch": "^4.0.1"
   },
   "devDependencies": {
